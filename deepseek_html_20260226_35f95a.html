@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShuleAI - Frontend</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .landing-page {
+            text-align: center;
+        }
+        .landing-page h1 {
+            font-size: 3rem;
+            color: #2E7D32;
+            margin-bottom: 0.5rem;
+        }
+        .landing-page .subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+            margin-bottom: 3rem;
+        }
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .role-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .role-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .role-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .role-card p {
+            color: #64748b;
+        }
+        .role-card.admin { border-top: 4px solid #ef4444; }
+        .role-card.teacher { border-top: 4px solid #3b82f6; }
+        .role-card.parent { border-top: 4px solid #eab308; }
+        .role-card.student { border-top: 4px solid #10b981; }
+
+        .form-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+        .form-container h2 {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #334155;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .btn {
+            background: #2E7D32;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #1B5E20;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #1e293b;
+            margin-top: 1rem;
+        }
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        .link {
+            color: #3b82f6;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+        .error {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .success {
+            color: #10b981;
+        }
+        .dashboard {
+            display: none;
+            padding: 2rem;
+        }
+        .dashboard.active {
+            display: block;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .dashboard-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .user-info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .user-info p {
+            margin: 0.5rem 0;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .hidden {
+            display: none;
+        }
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            border-left-color: #2E7D32;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .subjects-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .subject-tag {
+            background: #e2e8f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subject-tag i {
+            cursor: pointer;
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Landing Page -->
+        <div id="landing" class="landing-page">
+            <h1>ShuleAI</h1>
+            <p class="subtitle">Complete School Intelligence System</p>
+            <div class="role-grid">
+                <div class="role-card admin" onclick="showLogin('admin')">
+                    <i class="fas fa-user-shield"></i>
+                    <h3>Admin</h3>
+                    <p>Oversight & Management</p>
+                </div>
+                <div class="role-card teacher" onclick="showLogin('teacher')">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h3>Teacher</h3>
+                    <p>Academic Data Input</p>
+                </div>
+                <div class="role-card parent" onclick="showLogin('parent')">
+                    <i class="fas fa-user-friends"></i>
+                    <h3>Parent</h3>
+                    <p>Monitor & Guide</p>
+                </div>
+                <div class="role-card student" onclick="showLogin('student')">
+                    <i class="fas fa-user-graduate"></i>
+                    <h3>Student</h3>
+                    <p>Learn & Interact</p>
+                </div>
+            </div>
+            <p>Don't have an account? <span class="link" onclick="showTeacherSignup()">Teacher Signup</span></p>
+        </div>
+
+        <!-- Login Forms (one for each role) -->
+        <div id="login-admin" class="form-container">
+            <h2><i class="fas fa-user-shield" style="color:#ef4444;"></i> Admin Login</h2>
+            <form onsubmit="login(event, 'admin')">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="admin-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="admin-password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <button type="button" class="btn btn-secondary" onclick="backToLanding()">Back</button>
+            </form>
+        </div>
+
+        <div id="login-teacher" class="form-container">
+            <h2><i class="fas fa-chalkboard-teacher" style="color:#3b82f6;"></i> Teacher Login</h2>
+            <form onsubmit="login(event, 'teacher')">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="teacher-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="teacher-password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <button type="button" class="btn btn-secondary" onclick="backToLanding()">Back</button>
+            </form>
+            <p class="link" onclick="showTeacherSignup()">New teacher? Sign up here</p>
+        </div>
+
+        <div id="login-parent" class="form-container">
+            <h2><i class="fas fa-user-friends" style="color:#eab308;"></i> Parent Login</h2>
+            <form onsubmit="login(event, 'parent')">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="parent-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="parent-password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <button type="button" class="btn btn-secondary" onclick="backToLanding()">Back</button>
+            </form>
+        </div>
+
+        <div id="login-student" class="form-container">
+            <h2><i class="fas fa-user-graduate" style="color:#10b981;"></i> Student Login</h2>
+            <form onsubmit="login(event, 'student')">
+                <div class="form-group">
+                    <label>ELIMUID</label>
+                    <input type="text" id="student-elimuid" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="student-password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <button type="button" class="btn btn-secondary" onclick="backToLanding()">Back</button>
+            </form>
+        </div>
+
+        <!-- Teacher Signup Form (multi-step) -->
+        <div id="teacher-signup" class="form-container">
+            <h2><i class="fas fa-chalkboard-teacher" style="color:#3b82f6;"></i> Teacher Signup</h2>
+            <div id="signup-step1">
+                <div class="form-group">
+                    <label>School ID</label>
+                    <input type="text" id="signup-schoolId" placeholder="e.g. SCH-2024-00123" required>
+                </div>
+                <button class="btn" onclick="verifySchool()">Verify School</button>
+                <div id="verification-result"></div>
+            </div>
+            <div id="signup-step2" style="display:none;">
+                <form onsubmit="teacherSignup(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="signup-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="signup-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="signup-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Qualification</label>
+                        <input type="text" id="signup-qualification">
+                    </div>
+                    <div class="form-group">
+                        <label>Subjects (select multiple)</label>
+                        <select id="signup-subjects" multiple size="4">
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="English">English</option>
+                            <option value="Science">Science</option>
+                            <option value="History">History</option>
+                            <option value="Kiswahili">Kiswahili</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="Biology">Biology</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Class Teacher (optional)</label>
+                        <input type="text" id="signup-classTeacher" placeholder="e.g. Grade 5">
+                    </div>
+                    <button type="submit" class="btn">Submit Signup</button>
+                </form>
+                <button class="btn btn-secondary" onclick="backToLanding()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Dashboard (generic, will show role-specific info) -->
+        <div id="dashboard" class="dashboard">
+            <div class="dashboard-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+            </div>
+            <div id="dashboard-content" class="user-info">
+                <!-- populated by JS -->
+                <div class="spinner"></div>
+            </div>
+            <div class="cards-grid" id="dashboard-cards">
+                <!-- role-specific cards will be injected -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'https://shuleaibackend-32h1.onrender.com/api';
+
+        // State
+        let verifiedSchool = null; // holds school info after verification
+
+        // Helper: show/hide sections
+        function hideAll() {
+            document.getElementById('landing').style.display = 'none';
+            document.querySelectorAll('.form-container').forEach(el => el.style.display = 'none');
+            document.getElementById('dashboard').classList.remove('active');
+        }
+
+        function backToLanding() {
+            hideAll();
+            document.getElementById('landing').style.display = 'block';
+        }
+
+        function showLogin(role) {
+            hideAll();
+            document.getElementById(`login-${role}`).style.display = 'block';
+        }
+
+        function showTeacherSignup() {
+            hideAll();
+            document.getElementById('teacher-signup').style.display = 'block';
+            document.getElementById('signup-step1').style.display = 'block';
+            document.getElementById('signup-step2').style.display = 'none';
+            document.getElementById('verification-result').innerHTML = '';
+        }
+
+        // Verify school ID
+        async function verifySchool() {
+            const schoolId = document.getElementById('signup-schoolId').value.trim();
+            if (!schoolId) {
+                showError('verification-result', 'Please enter a school ID');
+                return;
+            }
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = 'Verifying...';
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/verify-school`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ schoolId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    verifiedSchool = data.data;
+                    document.getElementById('verification-result').innerHTML = `<p class="success">✅ Verified: ${verifiedSchool.schoolName}</p>`;
+                    document.getElementById('signup-step1').style.display = 'none';
+                    document.getElementById('signup-step2').style.display = 'block';
+                } else {
+                    showError('verification-result', data.message || 'Invalid school ID');
+                }
+            } catch (err) {
+                showError('verification-result', 'Network error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Verify School';
+            }
+        }
+
+        function showError(elementId, message) {
+            document.getElementById(elementId).innerHTML = `<p class="error">${message}</p>`;
+        }
+
+        // Teacher signup submission
+        async function teacherSignup(e) {
+            e.preventDefault();
+            if (!verifiedSchool) {
+                alert('Please verify school first');
+                return;
+            }
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const phone = document.getElementById('signup-phone').value;
+            const qualification = document.getElementById('signup-qualification').value;
+            const subjects = Array.from(document.getElementById('signup-subjects').selectedOptions).map(opt => opt.value);
+            const classTeacher = document.getElementById('signup-classTeacher').value;
+
+            const payload = {
+                name, email, password, phone,
+                schoolId: verifiedSchool.schoolId,
+                qualification,
+                subjects,
+                classTeacher: classTeacher || undefined
+            };
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Submitting...';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/teacher/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    backToLanding();
+                } else {
+                    alert(data.message || 'Signup failed');
+                }
+            } catch (err) {
+                alert('Network error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Signup';
+            }
+        }
+
+        // Login
+        async function login(e, role) {
+            e.preventDefault();
+            let payload = { role };
+            if (role === 'student') {
+                payload.elimuid = document.getElementById('student-elimuid').value;
+                payload.password = document.getElementById('student-password').value;
+            } else {
+                payload.email = document.getElementById(`${role}-email`).value;
+                payload.password = document.getElementById(`${role}-password`).value;
+            }
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Logging in...';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    // Store token and user info
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    localStorage.setItem('role', role);
+                    // Load dashboard
+                    loadDashboard();
+                } else {
+                    alert(data.message || 'Login failed');
+                }
+            } catch (err) {
+                alert('Network error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Login';
+            }
+        }
+
+        // Load dashboard after login
+        async function loadDashboard() {
+            hideAll();
+            document.getElementById('dashboard').classList.add('active');
+            const contentDiv = document.getElementById('dashboard-content');
+            const cardsDiv = document.getElementById('dashboard-cards');
+            contentDiv.innerHTML = '<div class="spinner"></div>';
+            cardsDiv.innerHTML = '';
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                logout();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const user = data.data.user;
+                    const role = user.role;
+                    contentDiv.innerHTML = `
+                        <h3>Welcome, ${user.name}!</h3>
+                        <p><strong>Role:</strong> ${role}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>School:</strong> ${user.schoolCode}</p>
+                    `;
+
+                    // Load role-specific data
+                    if (role === 'teacher') {
+                        loadTeacherData();
+                    } else if (role === 'student') {
+                        loadStudentData();
+                    } else if (role === 'parent') {
+                        loadParentData();
+                    } else if (role === 'admin') {
+                        loadAdminData();
+                    }
+                } else {
+                    logout();
+                }
+            } catch (err) {
+                console.error(err);
+                contentDiv.innerHTML = '<p class="error">Failed to load dashboard</p>';
+            }
+        }
+
+        async function loadTeacherData() {
+            const token = localStorage.getItem('token');
+            const cardsDiv = document.getElementById('dashboard-cards');
+            try {
+                const res = await fetch(`${API_BASE_URL}/teacher/students`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    let html = '<div class="card"><h3><i class="fas fa-users"></i> My Students</h3>';
+                    if (data.data.length === 0) {
+                        html += '<p>No students assigned.</p>';
+                    } else {
+                        html += '<ul>';
+                        data.data.forEach(s => {
+                            html += `<li>${s.User.name} (${s.grade})</li>`;
+                        });
+                        html += '</ul>';
+                    }
+                    html += '</div>';
+                    cardsDiv.innerHTML = html;
+                }
+            } catch (err) {
+                cardsDiv.innerHTML = '<p class="error">Failed to load students</p>';
+            }
+        }
+
+        async function loadStudentData() {
+            const token = localStorage.getItem('token');
+            const cardsDiv = document.getElementById('dashboard-cards');
+            try {
+                const res = await fetch(`${API_BASE_URL}/student/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const d = data.data;
+                    cardsDiv.innerHTML = `
+                        <div class="card">
+                            <h3><i class="fas fa-chart-line"></i> Performance</h3>
+                            <p>Average Score: ${d.averageScore?.toFixed(1) || 'N/A'}%</p>
+                            <p>Recent Records: ${d.recentRecords?.length || 0}</p>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-calendar-alt"></i> Attendance</h3>
+                            <p>Recent: ${d.recentAttendance?.length || 0} days</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                cardsDiv.innerHTML = '<p class="error">Failed to load data</p>';
+            }
+        }
+
+        async function loadParentData() {
+            const token = localStorage.getItem('token');
+            const cardsDiv = document.getElementById('dashboard-cards');
+            try {
+                const res = await fetch(`${API_BASE_URL}/parent/children`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    let html = '<div class="card"><h3><i class="fas fa-child"></i> My Children</h3>';
+                    if (data.data.length === 0) {
+                        html += '<p>No children linked.</p>';
+                    } else {
+                        html += '<ul>';
+                        data.data.forEach(c => {
+                            html += `<li>${c.User.name} (Grade ${c.grade})</li>`;
+                        });
+                        html += '</ul>';
+                    }
+                    html += '</div>';
+                    cardsDiv.innerHTML = html;
+                }
+            } catch (err) {
+                cardsDiv.innerHTML = '<p class="error">Failed to load children</p>';
+            }
+        }
+
+        async function loadAdminData() {
+            const cardsDiv = document.getElementById('dashboard-cards');
+            cardsDiv.innerHTML = `
+                <div class="card">
+                    <h3><i class="fas fa-school"></i> School Overview</h3>
+                    <p>Admin dashboard – you can manage teachers, students, etc.</p>
+                </div>
+            `;
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('role');
+            backToLanding();
+        }
+
+        // Check if already logged in on page load
+        (function init() {
+            if (localStorage.getItem('token')) {
+                loadDashboard();
+            } else {
+                backToLanding();
+            }
+        })();
+    </script>
+</body>
+</html>
